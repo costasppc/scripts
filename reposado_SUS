@@ -1,0 +1,67 @@
+-- all code by Flammable (https://github.com/flammable/flammable_scripts/blob/master/software_update/software_update_reposado.applescript)
+
+on run
+	
+	display dialog "Local Update Server για συστήματα από 10.4 έως και 10.9.
+
+Χρησιμοποιούμε πλέον την OpenSoure λύση Reposado, η οποία μιμείται τον Apple Software Update Server.
+
+Παρακαλώ θυμηθείτε όταν τελειώσετε να επιλέξετε τον εξωτερικό Apple SUS!
+
+Δείτε τα διαθέσιμα updates εδώ: http://reposado.systemgraph.net:8089
+
+Primary ASUS: 192.168.0.39 (reposado.systemgraph.net)
+
+
+	" buttons {"10.9, 10.8, 10.7, 10.6, 10.5 or 10.4", "Set to Apple default & Quit", "Quit!"} default button 1
+	set the button_pressed to the button returned of the result
+	if the button_pressed is "10.9, 10.8, 10.7, 10.6, 10.5 or 10.4" then
+		display dialog "The script will check you OS and inform you!" buttons {"OK, got it!"} default button 1 giving up after 2
+		tell application "System Events"
+			set OSVersion to do shell script "sw_vers -productVersion"
+		end tell
+		if OSVersion starts with "10.9" then
+			-- set up Mavericks thing
+			display dialog "OS X 10.9 Mavericks detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/others/index-10.9-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog"
+		else if OSVersion starts with "10.7" then
+			-- set up Lion thing
+			display dialog "MacOS X 10.7 Lion detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/others/index-lion-snowleopard-leopard.merged-1.sucatalog"
+		else if OSVersion starts with "10.8" then
+			-- set up MLion thing
+			display dialog "OS X 10.8 Mountain Lion detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/others/index-mountainlion-lion-snowleopard-leopard.merged-1.sucatalog"
+		else if OSVersion starts with "10.5" then
+			display dialog "MacOS X 10.5 Leopard detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			-- set up Leopard thing
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/others/index-leopard.merged-1.sucatalog"
+		else if OSVersion starts with "10.6" then
+			display dialog "MacOS X 10.6 Snow Leopard detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			-- set up Snow Leopard thing
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/others/index-leopard-snowleopard.merged-1.sucatalog"
+		else if OSVersion starts with "10.4" then
+			display dialog "MacOS X 10.4 Tiger detected! You will be redirected to the internal Server!" buttons {"OK, got it!"} default button 1 giving up after 2
+			-- set up Tiger thing
+			set catalogURLValue to "http://reposado.systemgraph.net:8088/content/catalogs/index.sucatalog"
+		else
+			--bail, because it's panther or less
+			display dialog "Maybe you have Tiger or Panther or older OS. Check please!" buttons {"OK, got it!"} default button 1 giving up after 2
+			return
+		end if
+		do shell script "defaults write /Library/Preferences/com.apple.SoftwareUpdate CatalogURL " & catalogURLValue with administrator privileges
+		
+	else if the button_pressed is "Set to Apple default & Quit" then
+		display dialog "You are switched Software Update to the default values. Bye!" buttons {"OK, bye!"} default button 1 giving up after 2
+		do shell script "defaults delete /Library/Preferences/com.apple.SoftwareUpdate CatalogURL" with administrator privileges
+		tell application "Local Update Server 15"
+			quit
+		end tell
+	else if the button_pressed is "Quit!" then
+		display dialog "Thank you and bye!" buttons {"OK, bye!"} default button 1 giving up after 1
+		tell application "Local Update Server 15"
+			quit
+		end tell
+		
+	end if
+end run
